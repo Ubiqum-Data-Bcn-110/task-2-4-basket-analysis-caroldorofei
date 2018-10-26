@@ -1,0 +1,48 @@
+---
+title: "Market Basket Analysis"
+author: ""
+date: "25 de octubre de 2018"
+output: pdf_document
+---
+#Business question
+#better understand the clientele that Electronidex is currently serving and if Electronidex would be an optimal acquisition
+
+```{r}
+#Clean environment
+rm(list = ls())
+arulesViz::#Load libraries
+library(arules)
+library(arulesViz)
+
+
+
+getwd()
+transactions <- read.transactions("ElectronidexTransactions2017.csv", sep = ",", format = "basket", rm.duplicates = FALSE)
+
+inspect(head(transactions))
+inspect(tail(transactions))
+
+length(transactions)
+size(head(transactions))
+LIST(head(transactions))
+itemLabels(transactions)
+class(transactions)
+
+itemFrequencyPlot(transactions, topN = 10)
+
+frequentItems <- eclat (transactions)
+inspect(frequentItems)
+frequentItems
+transactions
+image(sample(transactions,50))
+
+
+#Apriori algorithm
+rules <- apriori(transactions, parameter = list(supp = 0.005, conf = 0.7))
+rules
+inspect(rules)
+
+
+```
+
+
