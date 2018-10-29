@@ -7,18 +7,69 @@ output: pdf_document
 #Business question
 #better understand the clientele that Electronidex is currently serving and if Electronidex would be an optimal acquisition
 
-```{r}
+```{r include =FALSE}
 #Clean environment
 rm(list = ls())
-arulesViz::#Load libraries
+#Libraries
 library(arules)
 library(arulesViz)
-
-
-
-getwd()
+library(readr)
+library(ggplot2)
+```
+#Market Basket Analysis - Electronidex
+```{r}
+#Load Electronidex transaction data set
 transactions <- read.transactions("ElectronidexTransactions2017.csv", sep = ",", format = "basket", rm.duplicates = FALSE)
+test <- read.csv("ElectronidexTransactions2017.csv")
+transactions@itemInfo$category <- c("ExternalHD","ExternalHD","Mouse",
+                                        "ExternalHD","ExternalHD","Laptops",
+                                        "Desktop","Monitors","ComputerHeadphone",
+                                        "Laptops","Monitors","ActiveHeadphones",
+                                        "ActiveHeadphones","Laptops","Laptops",
+                                        "Keyboard","SmartHome","Keyboard",
+                                        "Keyboard","Monitors","Laptops",
+                                        "Desktop","Monitors","ComputerCords",
+                                        "Keyboard","Accessories","Speakers",
+                                        "Printers","PrinterInk","Speakers",
+                                        "PrinterInk","Printers","Accessories",
+                                        "Speakers","Desktop","Desktop",
+                                        "Desktop","MouseKeyboard","Laptops",
+                                        "Monitors","Keyboard","Speakers",
+                                        "Printers","PrinterInk","MouseKeyboard",
+                                        "Laptops","PrinterInk","Printers",
+                                        "ComputerCords","ComputerCords","Tablets",
+                                        "SmartHome","ComputerStands","Mouse",
+                                        "Mouse","SmartHome","ComputerStands",
+                                        "ComputerStands","ComputerCords","ComputerCords",
+                                        "ComputerStands","PrinterInk","Desktop",
+                                        "Laptops","Monitors","Laptops",
+                                        "Keyboard","Mouse","Printers",
+                                        "Desktop","Desktop","Tablets",
+                                        "Tablets","ComputerCords","Speakers",
+                                        "ComputerHeadphone","Tablets",
+                                        "ComputerHeadphone",
+                                        "Accessories","Desktop","Monitors",
+                                        "Laptops","Mouse","ComputerHeadphone",
+                                        "MouseKeyboard","Keyboard","MouseKeyboard",
+                                        "MouseKeyboard","MouseKeyboard","Speakers",
+                                        "ComputerHeadphone","Keyboard","Mouse",
+                                        "Speakers","Mouse","ComputerHeadphone",
+                                        "Accessories","MouseKeyboard","MouseKeyboard",
+                                        "ActiveHeadphones","ComputerStands",
+                                        "ActiveHeadphones",
+                                        "ActiveHeadphones","ComputerHeadphone",
+                                        "ComputerHeadphone","ActiveHeadphones","Mouse",
+                                        "MouseKeyboard","Keyboard","Speakers",
+                                        "SmartHome","ComputerCords","Tablets",
+                                        "Monitors","Monitors","ExternalHD",
+                                        "Mouse","SmartHome",
+                                        "Speakers","ComputerCords",
+                                        "ComputerCords","Monitors","Mouse",
+                                        "ComputerHeadphone","ComputerHeadphone") 
 
+
+str(transactions)
+#Data Exploration
 inspect(head(transactions))
 inspect(tail(transactions))
 
@@ -30,6 +81,12 @@ class(transactions)
 
 itemFrequencyPlot(transactions, topN = 10)
 
+
+transactions.prod.type <- transactions
+
+
+
+#Eclat
 frequentItems <- eclat (transactions)
 inspect(frequentItems)
 frequentItems
@@ -38,11 +95,47 @@ image(sample(transactions,50))
 
 
 #Apriori algorithm
-rules <- apriori(transactions, parameter = list(supp = 0.005, conf = 0.7))
+rules <- apriori(transactions, parameter = list(supp = 0.0035, conf = 0.7))
+rules<-sort(rules, by="lift",decreasing=TRUE)
 rules
 inspect(rules)
+
+verify.rules <- apriori (transactions,parameter=list (supp=0.001,conf = 0.3), appearance = list (lhs="HP Laptop",default="rhs"))
+
+verify.rules
+inspect(verify.rules)
+
+summary(rules)
+
+transactions@
+
+#Group by product type
+Accessories <- c("Belkin Mouse Pad","Computer Game","Large Mouse Pad"
+"Microsoft Office Home and Student 2016")
+
 
 
 ```
 
 
+#Customers Blackwell/Electronidex - Analysis of items sold per transaction 
+```{r}
+#Investigating Blackwell's customers
+blackwell <- read.csv("Blackwell_Demographic_Data.csv")
+head(blackwell)
+blackwell.online <- blackwell[blackwell$in.store == 0,]
+str(blackwell.online)
+
+
+blackwell.prod.types <- read.csv("existingProductAttributes.csv")   
+ggplot(blackwell.prod.types, aes(Product.Type,Volume)) + geom_bar(stat = "identity")
+blackwell.no.outliers <- blackwell.prod.types[blackwell.prod.types$Volume < 7000,]
+blackwell.no.outliers <- blackwell.prod.types[blackwell.prod.types$Volume != 1232,]
+ggplot(blackwell.no.outliers, aes(Product.Type,Volume)) + geom_bar(stat = "identity")
+
+##Comparar porcentagens???
+
+
+#Investigating Electronidex customers
+sum.items <- rowSums(transactions)
+```
