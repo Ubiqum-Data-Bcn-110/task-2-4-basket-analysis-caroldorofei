@@ -20,7 +20,8 @@ library(ggplot2)
 ```{r}
 #Load Electronidex transaction data set
 transactions <- read.transactions("ElectronidexTransactions2017.csv", sep = ",", format = "basket", rm.duplicates = FALSE)
-test <- read.csv("ElectronidexTransactions2017.csv")
+
+
 transactions@itemInfo$category <- c("ExternalHD","ExternalHD","Mouse",
                                         "ExternalHD","ExternalHD","Laptops",
                                         "Desktop","Monitors","ComputerHeadphone",
@@ -67,14 +68,31 @@ transactions@itemInfo$category <- c("ExternalHD","ExternalHD","Mouse",
                                         "ComputerCords","Monitors","Mouse",
                                         "ComputerHeadphone","ComputerHeadphone") 
 
-
+ProductTypes<- aggregate(transactions, by = "category")
+inspect(head(ProductTypes))
+str(ProductTypes)
+summary(transactions)
 str(transactions)
+
+#Split the data set
+transactions.company <- transactions[size(transactions) > 7]
+ProductTypes.company<- aggregate(transactions.company, by = "category")
+
+transactions.individual <- transactions[size(transactions) < 8]
+ProductTypes.individual<- aggregate(transactions.individual, by = "category")
+
+
+#save as curiosity - attempt to split dataset
+#transactions@data@p <- c(ifelse(size(transactions)<9,"individual","company"))
+#data.individual <- transactions[transactions == "individual",]
+
+
 #Data Exploration
 inspect(head(transactions))
 inspect(tail(transactions))
 
 length(transactions)
-size(head(transactions))
+size((transactions))
 LIST(head(transactions))
 itemLabels(transactions)
 class(transactions)
@@ -82,7 +100,6 @@ class(transactions)
 itemFrequencyPlot(transactions, topN = 10)
 
 
-transactions.prod.type <- transactions
 
 
 
@@ -96,25 +113,202 @@ image(sample(transactions,50))
 
 #Apriori algorithm
 rules <- apriori(transactions, parameter = list(supp = 0.0035, conf = 0.7))
-rules<-sort(rules, by="lift",decreasing=TRUE)
+
 rules
 inspect(rules)
 
-verify.rules <- apriori (transactions,parameter=list (supp=0.001,conf = 0.3), appearance = list (lhs="HP Laptop",default="rhs"))
 
-verify.rules
-inspect(verify.rules)
+lhs.only <- c("Acer Desktop","ASUS Desktop","CYBERPOWER Gamer Desktop","Dell 2 Desktop",
+              "Dell Desktop","HP Desktop","iMac","Intel Desktop","Lenovo Desktop Computer",
+              "Acer Aspire","Apple MacBook Air","Apple MacBook Pro",
+              "ASUS Chromebook","Dell Laptop","Eluktronics Pro Gaming Laptop",
+              "HP Laptop","HP Notebook Touchscreen Laptop PC","LG Touchscreen Laptop")
+rhs.only <- c("Belkin Mouse Pad","Computer Game","Large Mouse Pad",
+              "Microsoft Office Home and Student 2016","APIE Bluetooth Headphone",
+              "Apple Earpods","Monster Beats By Dr Dre",
+              "Otium Wireless Sports Bluetooth Headphone",
+              "Panasonic In-Ear Headphone","Philips Flexible Earhook Headphone",
+              "Audio Cable","Etekcity Power Extension Cord Cable","Ethernet Cable",
+              "HDMI Adapter","HDMI Cable 6ft","iPhone Charger Cable","Samsung Charging Cable",
+              "USB Cable","VGA Monitor Cable","Ailihen Stereo Headphones",
+              "Kensington Headphones","Koss Home Headphones","Logitech ClearChat Headset",
+              "Logitech Stereo Headset","Microsoft Headset",
+              "Panasonic On-Ear Stereo Headphones","PC Gaming Headset",
+              "XIBERIA Gaming Headset","Zombie Gaming Headset",
+              "Full Motion Monitor Mount","Halter Acrylic Monitor Stand",
+              "Halter Mesh Metal Monitor Stand","Height-Adjustable Standing Desk",
+              "Multi Media Stand","1TB Portable External Hard Drive",
+              "2TB Portable External Hard Drive","3TB Portable External Hard Drive",
+              "5TB Desktop Hard Drive","Slim 2TB Portable External Hard Drive",
+              "Apple Magic Keyboard","Apple Wired Keyboard","Apple Wireless Keyboard",
+              "Backlit LED Gaming Keyboard","Dell Wired Keyboard",
+              "HP USB Keyboard","Logitech Keyboard","Logitech Wireless Keyboard",
+              "Rii LED Keyboard","Acer Monitor","AOC Monitor","ASUS 2 Monitor",
+              "ASUS Monitor","Dell Monitor","HP Monitor","LG Monitor",
+              "Samsung Monitor","Sceptre Monitor","ViewSonic Monitor",
+              "3-Button Mouse","Gaming Mouse Professional","Generic Black 3-Button",
+              "HP Wireless Mouse","Logitech 3-button Mouse","Logitech Wireless Mouse",
+              "Microsoft Basic Optical Mouse","Redragon Gaming Mouse",
+              "Slim Wireless Mouse","Wireless Portable Mouse",
+              "Dell KM117 Wireless Keyboard & Mouse",
+              "EagleTec Wireless Combo Keyboard and Mouse",
+              "Logitech Desktop MK120 Mouse and keyboard Combo",
+              "Logitech MK270 Wireless Keyboard and Mouse Combo",
+              "Logitech MK360 Wireless Keyboard and Mouse Combo",
+              "Logitech MK550 Wireless Wave Keyboard and Mouse Combo",
+              "Microsoft Wireless Comfort Keyboard and Mouse",
+              "Microsoft Wireless Desktop Keyboard and Mouse",
+              "Rii LED Gaming Keyboard & Mouse Combo",
+              "Brother Printer Toner",
+              "Canon Ink","DYMO Labeling Tape","Epson Black Ink","HP Black & Tri-color Ink",
+              "Apple TV","Fire TV Stick","Google Home",
+              "Roku Express","Smart Light Bulb","Bose Companion Speakers",
+              "Cambridge Bluetooth Speaker","Cyber Acoustics",
+              "DOSS Touch Wireless Bluetooth","JBL Splashproof Portable Bluetooth Speaker",
+              "Logitech Multimedia Speakers","Mackie CR Speakers",
+              "Rokono Mini Speaker",
+              "Sonos")
 
-summary(rules)
-
-transactions@
-
-#Group by product type
-Accessories <- c("Belkin Mouse Pad","Computer Game","Large Mouse Pad"
-"Microsoft Office Home and Student 2016")
+rhs.category <- c("Accessories","ActiveHeadphones","ComputerCords","ComputerStands","ExternalHD","Keyboard","Monitors","Mouse","MouseKeyboard","PrinterInk","Printers","SmartHome","Speakers","Tablets")
+lhs.category <- c("Des")
 
 
+#Count items/basket
+size(transactions)
+print(transactions[1])
 
+transaction.list <- LIST(transactions)
+
+library(rlist)
+
+corporate <- vector("list")
+index <- 1
+buyer <- list()
+Computer <- c("")
+
+for (eachtr in transaction.list) 
+{
+  if (length(eachtr) > 4) 
+ {
+   corporate <- append(corporate,list(eachtr)) 
+ }
+ else
+   {
+   for (eachitem in eachtr)
+   {
+     if ()
+   }
+ }
+}  
+str(corporate)
+#for (ti in tr){
+  
+#corporate[c(index)]<- tr
+    #index <- index+1
+    #tr[length(tr)+1] <- "corporate"
+transaction.list[1]
+transaction.list[1][length(transaction.list[1])+1] <- "corporate"
+buyer
+length(tr)
+tr  
+
+
+
+
+
+str(corporate)
+transaction.list
+buyer[1]<-"corporate"
+
+corporate
+
+test <- c()
+list.append (test, 1)
+test[[]] <- 1
+
+corporate
+
+
+  
+x <- c()
+x[[1]] <- 5
+x
+
+
+inspect(head(transactions))
+LIST(transactions)
+
+transactions.individual <- transactions.individual[size(transactions.individual)>1]
+transactions.company <- transactions.company[size(transactions.company)>1]
+
+#Printers:"Brother Printer","Canon Office Printer","DYMO Label Manker","Epson Printer","HP Wireless Printer"
+#Tablets:"Fire HD Tablet","iPad","iPad Pro","Kindle","Samsung Galaxy Tablet"
+
+#Rules whole dataset
+rules <- apriori (transactions,parameter=list (supp=0.002,conf = 0.6), appearance = list (lhs=lhs.only,default="rhs"))
+rules
+inspect(rules)
+
+rules1 <- apriori (transactions,parameter=list (supp=0.0009,conf = 0.3), appearance = list (default="rhs",lhs=lhs.only))
+rules1
+inspect(sort(rules1, by = "lift",decreasing=TRUE)[1:10])
+summary(rules1)
+
+
+rules.category <- apriori (ProductTypes,parameter=list (supp=0.0005,conf = 0.4),appearance = list(rhs=rhs.category))
+rules.category
+inspect(sort(rules.category, by = "lift",decreasing=TRUE))
+
+transactions <- transactions[size(transactions)>1]
+transactions
+#Rules PRODUCTS under 7 items/transaction - INDIVIDUALS
+rules.individual.product1 <- apriori (transactions,parameter=list (supp=0.001,conf = 0.6), appearance = list (default="lhs",rhs=rhs.only))
+
+rules.individual.product1
+inspect(sort(rules.individual.product1, by = "lift",decreasing=TRUE))
+plot(rules.individual.product1,method = "graph",interactive=TRUE)
+
+
+#Rules PRODUCTS over 8 items/transaction - COMPANIES
+rules.company.product <- apriori (transactions.company,parameter=list (supp=0.015,conf = 0.8))
+rules.company.product
+inspect(sort(rules.company.product, by = "lift",decreasing=TRUE)[1:10])
+plot(rules.company.product,method = "graph",interactive=TRUE)
+
+
+#Rules Product Types under 7 - INDIVIDUALS
+rules.individual.category <- apriori (ProductTypes,parameter=list (supp=0.0009,conf = 0.4), appearance = list (default="lhs",rhs=rhs.category))
+rules.individual.category
+inspect(sort(rules.individual.category, by = "lift",decreasing=TRUE))
+plot(rules)
+plot(rules.individual.category,method = "graph",interactive=TRUE)
+
+#Rules Product Types over 8 - COMPANIES
+rules.company.category <- apriori (ProductTypes.company,parameter=list (supp=0.0008,conf = 0.5), appearance = list (default="lhs",rhs=rhs.category))
+
+rules.company.category
+inspect(sort(rules.company.category, by = "lift",decreasing=TRUE)[1:10])
+plot(rules.company.category,method = "graph",interactive=TRUE)
+
+#Plots
+itemFrequencyPlot(transactions,topN=10,type="absolute",main="Absolute Item Frequency Plot")
+itemFrequencyPlot(transactions,topN=10,type="relative",main="Relative Item Frequency Plot")
+
+itemFrequencyPlot(transactions.individual,topN=10,type="absolute",main="Absolute Item Frequency Plot")
+itemFrequencyPlot(transactions.individual,topN=10,type="relative",main="Relative Item Frequency Plot")
+
+itemFrequencyPlot(transactions.company,topN=10,type="absolute",main="Absolute Item Frequency Plot")
+itemFrequencyPlot(transactions.company,topN=10,type="relative",main="Relative Item Frequency Plot")
+
+
+
+
+
+str(transactions.individual)
+inspect(transactions.individual)
+onlyseven <- transactions[size(transactions) == 7]
+onlyseven
+inspect(tail(onlyseven))
 ```
 
 
@@ -125,7 +319,7 @@ blackwell <- read.csv("Blackwell_Demographic_Data.csv")
 head(blackwell)
 blackwell.online <- blackwell[blackwell$in.store == 0,]
 str(blackwell.online)
-
+hist(blackwell.online$items)
 
 blackwell.prod.types <- read.csv("existingProductAttributes.csv")   
 ggplot(blackwell.prod.types, aes(Product.Type,Volume)) + geom_bar(stat = "identity")
@@ -133,9 +327,8 @@ blackwell.no.outliers <- blackwell.prod.types[blackwell.prod.types$Volume < 7000
 blackwell.no.outliers <- blackwell.prod.types[blackwell.prod.types$Volume != 1232,]
 ggplot(blackwell.no.outliers, aes(Product.Type,Volume)) + geom_bar(stat = "identity")
 
-##Comparar porcentagens???
-
 
 #Investigating Electronidex customers
-sum.items <- rowSums(transactions)
+items.electronidex <- size(transactions)
+hist(items.electronidex)
 ```
