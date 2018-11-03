@@ -184,24 +184,37 @@ library(rlist)
 corporate <- vector("list")
 index <- 1
 buyer <- list()
-Computer <- c("")
+pc.count <- 0
+#Not included: "CYBERPOWER Gamer Desktop"
+Computer <- c("Acer Desktop","ASUS Desktop","Dell 2 Desktop",
+              "Dell Desktop","HP Desktop","iMac","Intel Desktop","Lenovo Desktop Computer",
+              "Acer Aspire","Apple MacBook Air","Apple MacBook Pro",
+              "ASUS Chromebook","Dell Laptop","Eluktronics Pro Gaming Laptop",
+              "HP Laptop","HP Notebook Touchscreen Laptop PC","LG Touchscreen Laptop")
+
+
 
 for (eachtr in transaction.list) 
 {
   if (length(eachtr) > 4) 
- {
-   corporate <- append(corporate,list(eachtr)) 
- }
+ {corporate <- append(corporate,list(eachtr))}
  else
    {
    for (eachitem in eachtr)
    {
-     if ()
+     if (eachitem %in% Computer)
+     {pc.count <- pc.count+1}
+     
+     
    }
+     if (pc.count > 1)
+     {corporate <- append(corporate,list(eachtr))}
+     pc.count <- 0
  }
 }  
-str(corporate)
-#for (ti in tr){
+length(corporate)
+View(corporate)
+
   
 #corporate[c(index)]<- tr
     #index <- index+1
