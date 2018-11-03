@@ -182,40 +182,102 @@ transaction.list <- LIST(transactions)
 library(rlist)
 
 corporate <- vector("list")
-index <- 1
-buyer <- list()
+individual <- vector("list")
 pc.count <- 0
+monitor.count <- 0
+printer.count <- 0
 #Not included: "CYBERPOWER Gamer Desktop"
 Computer <- c("Acer Desktop","ASUS Desktop","Dell 2 Desktop",
               "Dell Desktop","HP Desktop","iMac","Intel Desktop","Lenovo Desktop Computer",
               "Acer Aspire","Apple MacBook Air","Apple MacBook Pro",
               "ASUS Chromebook","Dell Laptop","Eluktronics Pro Gaming Laptop",
               "HP Laptop","HP Notebook Touchscreen Laptop PC","LG Touchscreen Laptop")
+Printer <- c("Brother Printer","Canon Office Printer","DYMO Label Manker","Epson Printer","HP Wireless Printer")
+Monitor <- c("Acer Monitor","AOC Monitor","ASUS 2 Monitor",
+              "ASUS Monitor","Dell Monitor","HP Monitor","LG Monitor",
+              "Samsung Monitor","Sceptre Monitor","ViewSonic Monitor")
+Keyboard <- c("Apple Magic Keyboard","Apple Wired Keyboard","Apple Wireless Keyboard",
+              "Backlit LED Gaming Keyboard","Dell Wired Keyboard",
+              "HP USB Keyboard","Logitech Keyboard","Logitech Wireless Keyboard",
+              "Rii LED Keyboard")
+Mouse <- c("3-Button Mouse","Gaming Mouse Professional","Generic Black 3-Button",
+              "HP Wireless Mouse","Logitech 3-button Mouse","Logitech Wireless Mouse",
+              "Microsoft Basic Optical Mouse","Redragon Gaming Mouse",
+              "Slim Wireless Mouse","Wireless Portable Mouse")
+Mouse.Keyboard <- c("Dell KM117 Wireless Keyboard & Mouse",
+              "EagleTec Wireless Combo Keyboard and Mouse",
+              "Logitech Desktop MK120 Mouse and keyboard Combo",
+              "Logitech MK270 Wireless Keyboard and Mouse Combo",
+              "Logitech MK360 Wireless Keyboard and Mouse Combo",
+              "Logitech MK550 Wireless Wave Keyboard and Mouse Combo",
+              "Microsoft Wireless Comfort Keyboard and Mouse",
+              "Microsoft Wireless Desktop Keyboard and Mouse",
+              "Rii LED Gaming Keyboard & Mouse Combo")
+Headphone <- c("APIE Bluetooth Headphone",
+              "Apple Earpods","Monster Beats By Dr Dre",
+              "Otium Wireless Sports Bluetooth Headphone",
+              "Panasonic In-Ear Headphone","Philips Flexible Earhook Headphone","Ailihen Stereo Headphones",
+              "Kensington Headphones","Koss Home Headphones","Logitech ClearChat Headset",
+              "Logitech Stereo Headset","Microsoft Headset",
+              "Panasonic On-Ear Stereo Headphones","PC Gaming Headset",
+              "XIBERIA Gaming Headset","Zombie Gaming Headset")
 
+Printerink <- c("Brother Printer Toner",
+              "Canon Ink","DYMO Labeling Tape","Epson Black Ink","HP Black & Tri-color Ink")
+Tablet <- c("Fire HD Tablet","iPad","iPad Pro","Kindle","Samsung Galaxy Tablet")
+HD <- c("1TB Portable External Hard Drive",
+              "2TB Portable External Hard Drive","3TB Portable External Hard Drive",
+              "5TB Desktop Hard Drive","Slim 2TB Portable External Hard Drive")
+Speaker <- c("Bose Companion Speakers",
+              "Cambridge Bluetooth Speaker","Cyber Acoustics",
+              "DOSS Touch Wireless Bluetooth","JBL Splashproof Portable Bluetooth Speaker",
+              "Logitech Multimedia Speakers","Mackie CR Speakers",
+              "Rokono Mini Speaker",
+              "Sonos")
 
 
 for (eachtr in transaction.list) 
 {
   if (length(eachtr) > 4) 
- {corporate <- append(corporate,list(eachtr))}
- else
+  {
+    corporate <- append(corporate,list(eachtr))
+  }
+  else
    {
-   for (eachitem in eachtr)
-   {
-     if (eachitem %in% Computer)
-     {pc.count <- pc.count+1}
-     
-     
-   }
-     if (pc.count > 1)
+     for (eachitem in eachtr)
+    {
+       if (eachitem %in% Computer)
+      {pc.count <- pc.count+1}
+      if (eachitem %in% Monitor)
+      {monitor.count <- monitor.count+1}
+      if (eachitem %in% Printer)
+      {printer.count <- printer.count+1}
+        
+    }
+  #verificar if corp
+     #else
+     #add to pf
+  }
+     if (pc.count > 1 || monitor.count > 1 || printer.count > 1)
      {corporate <- append(corporate,list(eachtr))}
+     else
+     {
+       individual <- append(individual,list(eachtr))
+     }
      pc.count <- 0
- }
-}  
+     printer.count <- 0
+     monitor.count <- 0
+}
+length(transaction.list)
+length(individual)      
 length(corporate)
 View(corporate)
 
-  
+#Transform list into transaction
+transaction.corporate <- as(corporate, "transactions")
+inspect(head(transaction.corporate))  
+str(transaction.corporate)
+
 #corporate[c(index)]<- tr
     #index <- index+1
     #tr[length(tr)+1] <- "corporate"
@@ -225,11 +287,45 @@ buyer
 length(tr)
 tr  
 
+#TESTING
+for (eachtr in transaction.list) 
+{
+  if (length(eachtr) > 4) 
+  {
+    corporate <- append(corporate,list(eachtr))}
+ else
+ {
+   for (eachitem in eachtr)
+   {
+     if (eachitem %in% Monitor)
+     {
+       monitor.count <- monitor.count+1
+     }
+    
+     
+     if(eachitem %in% Computer)
+     {
+       pc.count <- pc.count+1
+     }
+         
+       
+     }
+     
+ }
+     if (monitor.count > 1 || pc.count > 1)
+     {
+       corporate <- append(corporate,list(eachtr))
+     }
+    
+     monitor.count <- 0
+     pc.count <- 0
+ }
 
 
-
-
-str(corporate)
+#END OF TEST
+corporate <- c()
+monitor.count
+length(corporate)
 transaction.list
 buyer[1]<-"corporate"
 
