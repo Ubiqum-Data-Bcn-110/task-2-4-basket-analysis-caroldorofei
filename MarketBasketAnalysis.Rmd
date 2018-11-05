@@ -18,7 +18,9 @@ library(rlist)
 #Market Basket Analysis - Electronidex
 ```{r}
 #Load Electronidex transaction data set
-transactions <- read.transactions("ElectronidexTransactions2017.csv", sep = ",", format = "basket", rm.duplicates = FALSE)
+alltransactions <- read.transactions("ElectronidexTransactions2017.csv", sep = ",", format = "basket", rm.duplicates = FALSE)
+
+transactions <- alltransactions[size(alltransactions)>1]
 
 #Create new level
 transactions@itemInfo$category <- c("ExternalHD","ExternalHD","Mouse",
@@ -75,14 +77,24 @@ transaction.list <- LIST(transactions)
 
 corporate <- vector("list")
 individual <- vector("list")
+corporate <- c()
 pc.count <- 0
 monitor.count <- 0
 printer.count <- 0
-#Not included: "CYBERPOWER Gamer Desktop"
+keyboard.count <- 0
+mouse.kb.count <- 0
+mouse.count <- 0
+speaker.count <- 0
+headphone.count <- 0
+printerink.count <- 0
+tablet.count <- 0
+hd.count <- 0
+  
+
 Computer <- c("Acer Desktop","ASUS Desktop","Dell 2 Desktop",
               "Dell Desktop","HP Desktop","iMac","Intel Desktop","Lenovo Desktop Computer",
               "Acer Aspire","Apple MacBook Air","Apple MacBook Pro",
-              "ASUS Chromebook","Dell Laptop","Eluktronics Pro Gaming Laptop",
+              "ASUS Chromebook","CYBERPOWER Gamer Desktop","Dell Laptop","Eluktronics Pro Gaming Laptop",
               "HP Laptop","HP Notebook Touchscreen Laptop PC","LG Touchscreen Laptop")
 Printer <- c("Brother Printer","Canon Office Printer","DYMO Label Manker","Epson Printer","HP Wireless Printer")
 Monitor <- c("Acer Monitor","AOC Monitor","ASUS 2 Monitor",
@@ -138,16 +150,34 @@ for (eachtr in transaction.list)
    {
      for (eachitem in eachtr)
     {
-       if (eachitem %in% Computer)
+      if (eachitem %in% Computer)
       {pc.count <- pc.count+1}
       if (eachitem %in% Monitor)
       {monitor.count <- monitor.count+1}
       if (eachitem %in% Printer)
       {printer.count <- printer.count+1}
-        
+      if (eachitem %in% Keyboard)
+      {keyboard.count <- keyboard.count+1}
+      if (eachitem %in% Mouse.Keyboard)
+      {mouse.kb.count <- mouse.kb.count+1}
+      if (eachitem %in% Mouse)
+      {mouse.count <- mouse.count+1}
+      if (eachitem %in% Speaker)
+      {speaker.count <- speaker.count+1}
+      if (eachitem %in% Headphone)
+      {headphone.count <- headphone.count+1}
+      if (eachitem %in% Printerink)
+      {printerink.count <- printerink.count+1}
+      if (eachitem %in% Tablet)
+      {tablet.count <- tablet.count+1}
+      if (eachitem %in% HD)
+      {hd.count <- hd.count+1}
     }
-      if (pc.count > 1 || monitor.count > 1 || printer.count > 1)
-      {corporate <- append(corporate,list(eachtr))}
+      if (pc.count > 1 || monitor.count > 1 || printer.count > 1 || 
+          keyboard.count > 1 || mouse.kb.count > 1 || mouse.count > 2 || speaker.count > 1 || 
+          headphone.count > 2 || printerink.count > 1 || tablet.count > 2 || hd.count > 2)
+      
+        {corporate <- append(corporate,list(eachtr))}
       else
       {
        individual <- append(individual,list(eachtr))
@@ -156,45 +186,35 @@ for (eachtr in transaction.list)
      pc.count <- 0
      printer.count <- 0
      monitor.count <- 0
+     keyboard.count <- 0
+     mouse.kb.count <- 0
+     mouse.count <- 0
+     speaker.count <- 0
+     headphone.count <- 0
+     printerink.count <- 0
+     tablet.count <- 0
+     hd.count <- 0
 }
 length(transaction.list)
 length(individual)      
 length(corporate)
-View(corporate)
 
-#Transform list into transaction
+
+#Transform lists into transaction
 transaction.corporate <- as(corporate, "transactions")
+transaction.individual <- as(individual, "transactions")
+
 inspect(head(transaction.corporate))  
 str(transaction.corporate)
+str(transaction.individual)
 
+#Data exploration CORPORATE
+itemFrequencyPlot(transaction.corporate,topN=10,type="relative",main="Top 10 - Corporate Customers")
+dev.off()
+#Data exploration INDIVIDUAL
+itemFrequencyPlot(transaction.individual,topN=10,type="absolute",main="Top 10 - Individual Customers")
 
-#Data Exploration before split
-inspect(head(transactions))
-inspect(tail(transactions))
-
-length(transactions)
-size((transactions))
-LIST(head(transactions))
-itemLabels(transactions)
-class(transactions)
-
-itemFrequencyPlot(transactions, topN = 10)
-
-#Eclat
-frequentItems <- eclat (transactions)
-inspect(frequentItems)
-frequentItems
-transactions
-image(sample(transactions,50))
-
-
-#Apriori algorithm
-rules <- apriori(transactions, parameter = list(supp = 0.0035, conf = 0.7))
-
-rules
-inspect(rules)
-
-
+#Preparation for apriori rules
 lhs.only <- c("Acer Desktop","ASUS Desktop","CYBERPOWER Gamer Desktop","Dell 2 Desktop",
               "Dell Desktop","HP Desktop","iMac","Intel Desktop","Lenovo Desktop Computer",
               "Acer Aspire","Apple MacBook Air","Apple MacBook Pro",
@@ -247,7 +267,53 @@ rhs.only <- c("Belkin Mouse Pad","Computer Game","Large Mouse Pad",
               "Sonos")
 
 rhs.category <- c("Accessories","ActiveHeadphones","ComputerCords","ComputerStands","ExternalHD","Keyboard","Monitors","Mouse","MouseKeyboard","PrinterInk","Printers","SmartHome","Speakers","Tablets")
-lhs.category <- c("Des")
+
+summary(transaction.corporate)
+
+#Rules CORPORATE
+rules <- apriori (transaction.corporate,parameter=list (supp=0.001,conf = 0.7), appearance = list(rhs=rhs.only,default="lhs"))
+rules
+summary(rules)
+inspect(sort(rules, by = "lift",decreasing=TRUE)[1:20])
+plot(rules,method = "graph",interactive=TRUE)
+
+#Rules INDIVIDUAL
+rules.individual <- apriori (transaction.individual,parameter=list (supp=0.0009,conf = 0.6))
+rules.individual
+inspect(sort(rules.individual, by = "lift",decreasing=TRUE))
+plot(rules.individual,method = "graph",interactive=TRUE)
+```
+
+```{r}
+
+#Data Exploration before split
+inspect(head(transactions))
+inspect(tail(transactions))
+
+length(transactions)
+size((transactions))
+LIST(head(transactions))
+itemLabels(transactions)
+class(transactions)
+
+itemFrequencyPlot(transactions, topN = 10)
+
+#Eclat
+frequentItems <- eclat (transactions)
+inspect(frequentItems)
+frequentItems
+transactions
+image(sample(transactions,50))
+
+
+#Apriori algorithm
+rules <- apriori(transactions, parameter = list(supp = 0.0035, conf = 0.7))
+
+rules
+inspect(rules)
+
+
+
 
 transactions.individual <- transactions.individual[size(transactions.individual)>1]
 transactions.company <- transactions.company[size(transactions.company)>1]
